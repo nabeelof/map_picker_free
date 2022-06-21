@@ -6,6 +6,7 @@ it is completely free and easy to use.
 * Pick location from map
 * Search location by places
 * Easy to use
+* Absolutely free without any API key
 
 
 

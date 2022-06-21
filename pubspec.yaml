@@ -1,7 +1,7 @@
 name: map_picker_free
-description: A flutter place search and location picker plugin that uses Open Street Map.
+description: A flutter place search and location picker plugin that uses Open Street Map for free without any API key.
 version: 0.0.1
-homepage:
+homepage: https://github.com/MicroProgramer/map_picker_free.git
 
 environment:
   sdk: ">=2.16.0 <3.0.0"
