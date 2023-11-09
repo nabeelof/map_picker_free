@@ -14,7 +14,13 @@ class MapPicker extends StatefulWidget {
   final Color? primaryColor;
   final bool? showZoomButtons;
 
-  const MapPicker({Key? key, required this.center, required this.onPicked, this.primaryColor, this.showZoomButtons}) : super(key: key);
+  const MapPicker(
+      {Key? key,
+      required this.center,
+      required this.onPicked,
+      this.primaryColor,
+      this.showZoomButtons})
+      : super(key: key);
 
   @override
   State<MapPicker> createState() => _MapPickerState();
@@ -37,12 +43,15 @@ class _MapPickerState extends State<MapPicker> {
     if (kDebugMode) {
       print(longitude);
     }
-    String url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
+    String url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
 
     var response = await client.post(Uri.parse(url));
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+    var decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
 
-    _searchController.text = decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
+    _searchController.text =
+        decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
     setState(() {});
   }
 
@@ -56,12 +65,15 @@ class _MapPickerState extends State<MapPicker> {
     if (kDebugMode) {
       print(longitude);
     }
-    String url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
+    String url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
 
     var response = await client.post(Uri.parse(url));
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+    var decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
 
-    _searchController.text = decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
+    _searchController.text =
+        decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
     setState(() {});
   }
 
@@ -69,18 +81,15 @@ class _MapPickerState extends State<MapPicker> {
   void initState() {
     _mapController = MapController();
 
-    _mapController.onReady.then((_) {
-      setNameCurrentPosAtInit();
-    });
-
     _mapController.mapEventStream.listen((event) async {
       if (event is MapEventMoveEnd) {
         var client = http.Client();
         String url =
-            'https://nominatim.openstreetmap.org/reverse?format=json&lat=${event.center.latitude}&lon=${event.center.longitude}&zoom=18&addressdetails=1';
+            'https://nominatim.openstreetmap.org/reverse?format=json&lat=${_mapController.camera.center..latitude}&lon=${_mapController.camera.center..longitude}&zoom=18&addressdetails=1';
 
         var response = await client.post(Uri.parse(url));
-        var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+        var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes))
+            as Map<dynamic, dynamic>;
 
         _searchController.text = decodedResponse['display_name'];
         setState(() {});
@@ -99,10 +108,13 @@ class _MapPickerState extends State<MapPicker> {
   @override
   Widget build(BuildContext context) {
     OutlineInputBorder inputBorder = OutlineInputBorder(
-      borderSide: BorderSide(color: widget.primaryColor ?? Theme.of(context).primaryColor),
+      borderSide: BorderSide(
+          color: widget.primaryColor ?? Theme.of(context).primaryColor),
     );
     OutlineInputBorder inputFocusBorder = OutlineInputBorder(
-      borderSide: BorderSide(color: widget.primaryColor ?? Theme.of(context).primaryColor, width: 2.0),
+      borderSide: BorderSide(
+          color: widget.primaryColor ?? Theme.of(context).primaryColor,
+          width: 2.0),
     );
     final showZoom = widget.showZoomButtons ?? false;
 
@@ -112,18 +124,27 @@ class _MapPickerState extends State<MapPicker> {
         children: [
           Positioned.fill(
               child: FlutterMap(
-                options: MapOptions(center: LatLng(widget.center.latitude, widget.center.longitude), zoom: 15.0, maxZoom: 18, minZoom: 6),
-                mapController: _mapController,
-                layers: [
-                  TileLayerOptions(
-                    urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    subdomains: ['a', 'b', 'c'],
-                    // attributionBuilder: (_) {
-                    //   return Text("© OpenStreetMap contributors");
-                    // },
-                  ),
-                ],
-              )),
+            options: MapOptions(
+                center: LatLng(widget.center.latitude, widget.center.longitude),
+                zoom: 15.0,
+                maxZoom: 18,
+                minZoom: 6,
+                onMapReady: () {
+                  setNameCurrentPosAtInit();
+                },
+            ),
+            mapController: _mapController,
+            children: [
+              TileLayer(
+                urlTemplate:
+                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                subdomains: ['a', 'b', 'c'],
+                // attributionBuilder: (_) {
+                //   return Text("© OpenStreetMap contributors");
+                // },
+              ),
+            ],
+          )),
           Positioned(
               top: MediaQuery.of(context).size.height * 0.5,
               left: 0,
@@ -140,13 +161,13 @@ class _MapPickerState extends State<MapPicker> {
               )),
           const Positioned.fill(
               child: IgnorePointer(
-                child: Center(
-                  child: Icon(
-                    Icons.location_pin,
-                    size: 50,
-                  ),
-                ),
-              )),
+            child: Center(
+              child: Icon(
+                Icons.location_pin,
+                size: 50,
+              ),
+            ),
+          )),
           if (showZoom)
             Positioned(
                 bottom: 120,
@@ -154,7 +175,8 @@ class _MapPickerState extends State<MapPicker> {
                 child: FloatingActionButton(
                   backgroundColor: Theme.of(context).primaryColor,
                   onPressed: () {
-                    _mapController.move(_mapController.center, _mapController.zoom + 1);
+                    _mapController.move(
+                        _mapController.center, _mapController.zoom + 1);
                   },
                   child: Icon(Icons.add),
                 )),
@@ -165,7 +187,8 @@ class _MapPickerState extends State<MapPicker> {
                 child: FloatingActionButton(
                   backgroundColor: Theme.of(context).primaryColor,
                   onPressed: () {
-                    _mapController.move(_mapController.center, _mapController.zoom - 1);
+                    _mapController.move(
+                        _mapController.center, _mapController.zoom - 1);
                   },
                   child: Icon(Icons.remove),
                 )),
@@ -192,23 +215,30 @@ class _MapPickerState extends State<MapPicker> {
                       onChanged: (String value) {
                         if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-                        _debounce = Timer(const Duration(milliseconds: 2000), () async {
+                        _debounce =
+                            Timer(const Duration(milliseconds: 2000), () async {
                           if (kDebugMode) {
                             print(value);
                           }
                           var client = http.Client();
                           try {
-                            String url = 'https://nominatim.openstreetmap.org/search?q=$value&format=json&polygon_geojson=1&addressdetails=1';
+                            String url =
+                                'https://nominatim.openstreetmap.org/search?q=$value&format=json&polygon_geojson=1&addressdetails=1';
                             if (kDebugMode) {
                               print(url);
                             }
                             var response = await client.post(Uri.parse(url));
-                            var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+                            var decodedResponse =
+                                jsonDecode(utf8.decode(response.bodyBytes))
+                                    as List<dynamic>;
                             if (kDebugMode) {
                               print(decodedResponse);
                             }
                             _options = decodedResponse
-                                .map((e) => OSMdata(displayname: e['display_name'], lat: double.parse(e['lat']), lon: double.parse(e['lon'])))
+                                .map((e) => OSMdata(
+                                    displayname: e['display_name'],
+                                    lat: double.parse(e['lat']),
+                                    lon: double.parse(e['lon'])))
                                 .toList();
                             setState(() {});
                           } finally {
@@ -226,9 +256,13 @@ class _MapPickerState extends State<MapPicker> {
                         itemBuilder: (context, index) {
                           return ListTile(
                             title: Text(_options[index].displayname),
-                            subtitle: Text('${_options[index].lat},${_options[index].lon}'),
+                            subtitle: Text(
+                                '${_options[index].lat},${_options[index].lon}'),
                             onTap: () {
-                              _mapController.move(LatLng(_options[index].lat, _options[index].lon), 15.0);
+                              _mapController.move(
+                                  LatLng(
+                                      _options[index].lat, _options[index].lon),
+                                  15.0);
 
                               _focusNode.unfocus();
                               _options.clear();
@@ -248,7 +282,8 @@ class _MapPickerState extends State<MapPicker> {
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: CustomButton('Set Current Location', onPressed: () async {
+                child:
+                    CustomButton('Set Current Location', onPressed: () async {
                   pickData().then((value) {
                     widget.onPicked(value);
                   });
@@ -262,13 +297,15 @@ class _MapPickerState extends State<MapPicker> {
   }
 
   Future<PickedData> pickData() async {
-    LatLong center = LatLong(_mapController.center.latitude, _mapController.center.longitude);
+    LatLong center = LatLong(
+        _mapController.center.latitude, _mapController.center.longitude);
     var client = http.Client();
     String url =
         'https://nominatim.openstreetmap.org/reverse?format=json&lat=${_mapController.center.latitude}&lon=${_mapController.center.longitude}&zoom=18&addressdetails=1';
 
     var response = await client.post(Uri.parse(url));
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+    var decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
     String displayName = decodedResponse['display_name'];
     return PickedData(latLong: center, address: displayName);
   }
@@ -318,7 +355,11 @@ class PickedData {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is PickedData && runtimeType == other.runtimeType && latLong == other.latLong && address == other.address);
+      identical(this, other) ||
+      (other is PickedData &&
+          runtimeType == other.runtimeType &&
+          latLong == other.latLong &&
+          address == other.address);
 
   @override
   int get hashCode => latLong.hashCode ^ address.hashCode;
